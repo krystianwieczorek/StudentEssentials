@@ -1,0 +1,6 @@
+{
+  "apiUrl": "#{API_URL}#",
+  "dev": {
+    "enableReduxDevToolsExtension": true
+  }
+}
