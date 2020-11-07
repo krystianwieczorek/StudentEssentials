@@ -11,16 +11,20 @@ import {
 import { Chip } from "react-native-paper";
 import { List } from "react-native-paper";
 import { useState, useEffect } from "react";
-import { getSubjectList } from "../api/getSubjectList";
+import { getShedulePerDay } from "../api/getShedulePerDay";
+import { DayEnum } from "../common/DayEnum";
+import { ActivityIndicator } from "react-native-paper";
 
 export const Schedule = () => {
   const [subcjetsList, setSubjectList] = useState();
-  const [day, setDay] = useState("Monday");
+  const [day, setDay] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    getSubjectList(day).then((response) => {
-      setSubjectList(response);
-      console.log(response);
+    setIsLoading(true);
+    getShedulePerDay(1, day).then((response) => {
+      setSubjectList(response.data);
+      setIsLoading(false);
     });
   }, [day]);
 
@@ -31,7 +35,7 @@ export const Schedule = () => {
           style={styles.chip}
           textStyle={{ fontSize: 10, color: "white" }}
           onPress={() => {
-            setDay("Monday");
+            setDay(1);
           }}
         >
           Monday
@@ -39,49 +43,58 @@ export const Schedule = () => {
         <Chip
           style={styles.chip}
           textStyle={{ fontSize: 10, color: "white" }}
-          onPress={() => setDay("Tuesday")}
+          onPress={() => setDay(2)}
         >
           Tuesday
         </Chip>
         <Chip
           style={styles.chip}
           textStyle={{ fontSize: 10, color: "white" }}
-          onPress={() => setDay("Wednesday")}
+          onPress={() => setDay(3)}
         >
           Wednesday
         </Chip>
         <Chip
           style={styles.chip}
           textStyle={{ fontSize: 10, color: "white" }}
-          onPress={() => console.log("Thursday")}
+          onPress={() => setDay(4)}
         >
           Thursday
         </Chip>
         <Chip
           style={styles.chip}
           textStyle={{ fontSize: 10, color: "white" }}
-          onPress={() => console.log("Friday")}
+          onPress={() => setDay(5)}
         >
           Friday
         </Chip>
       </Appbar.Header>
-      <Text style={styles.text}>{day}</Text>
-      <SafeAreaView style={styles.scrollConteriner}>
-        <ScrollView>
-          <List.Section>
-            {subcjetsList?.map((item, key) => (
-              <List.Item
-                key={key}
-                title={`${item.title}`}
-                description={`hours: ${item.startTime} - ${
-                  item.endTime
-                } ${"\n"} prof: ${item.prof} `}
-                left={(props) => <List.Icon {...props} icon="folder" />}
-              />
-            ))}
-          </List.Section>
-        </ScrollView>
-      </SafeAreaView>
+      <Text style={styles.text}>{DayEnum[day]}</Text>
+      {isLoading ? (
+        <ActivityIndicator
+          style={styles.activityIndicator}
+          size={50}
+          animating={isLoading}
+          color="#006494"
+        />
+      ) : (
+        <SafeAreaView style={styles.scrollConteriner}>
+          <ScrollView>
+            <List.Section>
+              {subcjetsList?.map((item, key) => (
+                <List.Item
+                  key={key}
+                  title={`${item.subject.name}`}
+                  description={`${""} hours: ${item.startTime} - ${
+                    item.endTime
+                  } ${"\n"} prof: ${item.subject.profesor} `}
+                  left={(props) => <List.Icon {...props} icon="folder" />}
+                />
+              ))}
+            </List.Section>
+          </ScrollView>
+        </SafeAreaView>
+      )}
     </>
   );
 };
@@ -100,5 +113,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginTop: 10,
     marginLeft: 15,
+  },
+  activityIndicator: {
+    width: "100%",
+    height: "80%",
+    justifyContent: "center",
   },
 });

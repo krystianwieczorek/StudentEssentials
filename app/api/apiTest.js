@@ -1,7 +1,9 @@
 import { apiClient } from "./apiClient";
-import { AxiosResponse } from "axios";
+import axios from "axios";
 
-export const getDailyreports = async (url) => {
-  const response = await apiClient.get(url);
-  return response;
+export const apiTest = async () => {
+  await apiClient
+    .get(`/api/shedules/${sheduleId}/${sheduleDay}`)
+    .then((respo) => console.log(respo))
+    .catch((err) => err);
 };

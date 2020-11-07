@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { Provider as ReduxProvider } from "react-redux";
-import AppbarBottom from "./app/components/AppbarBottom";
-import AppBarTop from "./app/components/AppBarTop";
 import configureStore from "./app/store/store";
 import { getDailyreports } from "./app/api/apiTest";
 import { NavigationContainer } from "@react-navigation/native";
@@ -16,7 +14,16 @@ import Register from "./app/views/Register";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { createStackNavigator } from "@react-navigation/stack";
+import { Menu } from "./app/views/Menu";
 import { Schedule } from "./app/views/Schedule";
+import { SimpleLineIcons } from "@expo/vector-icons";
+import {
+  isSignedInSelector,
+  authSelector,
+} from "./app/store/selectors/authSelector";
+import { useSelector, useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import UserProfile from "./app/views/UserProfile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -58,7 +65,26 @@ const MessengerStackScreen = () => {
     </Stack.Navigator>
   );
 };
-const HomeStackScreen = () => {
+const MenuStackScreen = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        title: `Student Essential`,
+        headerStyle: {
+          backgroundColor: "#006494",
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      }}
+    >
+      <Stack.Screen name="Menu" component={Menu} />
+      <Stack.Screen name="UserProfile" component={UserProfile} />
+    </Stack.Navigator>
+  );
+};
+const SheduleStackScreen = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -72,19 +98,27 @@ const HomeStackScreen = () => {
             fontWeight: "bold",
           },
         }}
-        name="Home"
-        component={Home}
+        name="Menu"
+        component={Schedule}
       />
     </Stack.Navigator>
   );
 };
 
 export default function App() {
+  const isSignedIn = useSelector(isSignedInSelector);
+  const token = useSelector(authSelector);
+
+  useEffect(() => {
+    const setUserToken = async () => {
+      token != null && (await AsyncStorage.setItem("token", token));
+    };
+    setUserToken();
+  }, [token]);
   return (
-    <ReduxProvider store={configureStore}>
-      <PaperProvider>
-        <NavigationContainer>
-          {/* <AppBarTop /> */}
+    <PaperProvider>
+      <NavigationContainer>
+        {isSignedIn ? (
           <Tab.Navigator
             screenOptions={({ route }) => ({
               tabBarIcon: ({ focused, color, size }) => {
@@ -96,9 +130,11 @@ export default function App() {
                   );
                 } else if (route.name === "Login") {
                   return <Entypo name="login" size={24} color={color} />;
+                } else if (route.name === "Menu") {
+                  return (
+                    <SimpleLineIcons name="menu" size={24} color={color} />
+                  );
                 }
-
-                // You can return any component that you like here!
               },
             })}
             tabBarOptions={{
@@ -106,13 +142,18 @@ export default function App() {
               inactiveTintColor: "gray",
             }}
           >
-            <Tab.Screen name="Login" component={LoginStackScreen} />
-            <Tab.Screen name="Student's Schedule" component={HomeStackScreen} />
+            <Tab.Screen
+              name="Student's Schedule"
+              component={SheduleStackScreen}
+            />
             <Tab.Screen name="Messenger" component={MessengerStackScreen} />
+            <Tab.Screen name="Menu" component={MenuStackScreen} />
           </Tab.Navigator>
-        </NavigationContainer>
-        <StatusBar style="auto" />
-      </PaperProvider>
-    </ReduxProvider>
+        ) : (
+          <LoginStackScreen />
+        )}
+      </NavigationContainer>
+      <StatusBar style="auto" />
+    </PaperProvider>
   );
 }

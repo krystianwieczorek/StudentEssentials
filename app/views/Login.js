@@ -3,16 +3,51 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { TextInput } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
 import { useForm, Controller } from "react-hook-form";
-import { Button } from "react-native-paper";
+import { Button, Snackbar } from "react-native-paper";
+import { authClient } from "../api/authClient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  isSignedInSelector,
+  authSelector,
+} from "../store/selectors/authSelector";
+import { loginAction } from "../store/actions/loginAction";
 
 export default function Login({ navigation }) {
-  const onSubmit = (data) => console.log(data);
+  const dispatch = useDispatch();
+  const [visible, setVisible] = React.useState(false);
+
+  const onDismissSnackBar = () => setVisible(false);
+
+  const onSubmit = (data) => {
+    authClient(data)
+      .then((response) => {
+        dispatch(loginAction(response.data.token, response.data.id));
+        console.log(response.data);
+      })
+      .catch(() => setVisible(true));
+  };
   const { control, handleSubmit, errors } = useForm();
+
+  const test = async () => {
+    console.log(navigation);
+  };
 
   return (
     <View style={styles.container}>
+      <Snackbar
+        visible={visible}
+        duration={3000}
+        onDismiss={onDismissSnackBar}
+        style={styles.snackbar}
+      >
+        <Text style={styles.snackbarText}>
+          Username or password is incorect!
+        </Text>
+      </Snackbar>
       <FontAwesome style={styles.icon} name="lock" size={50} color="black" />
       <Text style={styles.text}>Sign in</Text>
+      <Button onPress={test}>Test</Button>
       <Controller
         control={control}
         render={({ onChange, onBlur, value }) => (
@@ -26,7 +61,7 @@ export default function Login({ navigation }) {
           />
         )}
         name="email"
-        rules={{ required: true, pattern: /^\S+@\S+\.\S+$/ }}
+        // rules={{ required: true, pattern: /^\S+@\S+\.\S+$/ }}
         defaultValue=""
       />
       {errors.email && (
@@ -45,7 +80,7 @@ export default function Login({ navigation }) {
           />
         )}
         name="password"
-        rules={{ required: true }}
+        // rules={{ required: true }}
         defaultValue=""
       />
       {errors.password && (
@@ -67,7 +102,7 @@ export default function Login({ navigation }) {
         onPress={() => navigation.navigate("Register")}
       >
         <Text>
-          Don't have an account?{" "}
+          Don't have an account?
           <Text style={{ color: "#006494", fontWeight: "bold" }}>Sign Up</Text>
         </Text>
       </Button>
@@ -110,5 +145,11 @@ const styles = StyleSheet.create({
     height: 40,
     padding: 10,
     borderRadius: 4,
+  },
+  snackbar: {
+    backgroundColor: "#7d0633",
+  },
+  snackbarText: {
+    textAlign: "center",
   },
 });

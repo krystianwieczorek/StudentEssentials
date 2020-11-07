@@ -1,5 +1,5 @@
 {
-  "apiUrl": "https://run.mocky.io/",
+  "apiUrl": "https://96f61242faab.ngrok.io/",
   "dev": {
     "enableReduxDevToolsExtension": true
   }

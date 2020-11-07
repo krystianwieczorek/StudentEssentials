@@ -1,20 +1,53 @@
-import React, { useEffect } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, StyleSheet, Text, View, Picker } from "react-native";
 import { TextInput } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
 import { useForm, Controller } from "react-hook-form";
-import { Button } from "react-native-paper";
+import { Button, Modal, Portal, Provider, Snackbar } from "react-native-paper";
 import { Fontisto } from "@expo/vector-icons";
+import { getAllGroups } from "../api/getAllGroups";
+import { addNewUser } from "../api/addNewUser";
 
-export default function Login({ navigation }) {
-  const onSubmit = (data) => console.log(data);
+export default function Register({ navigation }) {
+  const [selectedValue, setSelectedValue] = useState();
+  const [visible, setVisible] = useState(false);
+  const [groups, setGroups] = useState();
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
   const { control, handleSubmit, errors } = useForm();
+  const [visibleSNack, setVisibleSnack] = useState(false);
+
+  const onDismissSnackBar = () => setVisible(false);
+
+  // const onSubmit = (data) => console.log(data);
+
+  const onSubmit = (data) => {
+    addNewUser(data).then((response) => {
+      response.status == "200" && setVisibleSnack(true);
+      setTimeout(() => {
+        navigation.navigate("Login");
+        clearTimeout();
+      }, 2000);
+    });
+  };
+
+  useEffect(() => {
+    getAllGroups().then((response) => setGroups(response.data));
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.text}>
         Sign up <Fontisto name="unlocked" size={24} color="black" />
       </Text>
+      <Snackbar
+        visible={visibleSNack}
+        duration={3000}
+        onDismiss={onDismissSnackBar}
+        style={styles.snackbar}
+      >
+        <Text style={styles.snackbarText}>Now u can Sign In!</Text>
+      </Snackbar>
       <Controller
         control={control}
         render={({ onChange, onBlur, value }) => (
@@ -92,17 +125,75 @@ export default function Login({ navigation }) {
         <Text style={styles.errorMessage}>Password is required.</Text>
       )}
 
-      <Button
-        mode="contained"
-        style={styles.button}
-        title="Submit"
-        onPress={handleSubmit(onSubmit)}
-      >
-        Sign Up
-      </Button>
+      <Controller
+        control={control}
+        render={() => (
+          <Provider>
+            <Portal>
+              <Modal
+                visible={visible}
+                onDismiss={hideModal}
+                contentContainerStyle={styles.modal}
+              >
+                <Controller
+                  control={control}
+                  render={({ onChange, onBlur, value }) => (
+                    <Picker
+                      selectedValue={selectedValue}
+                      style={styles.picker}
+                      onValueChange={(itemValue, itemIndex) => {
+                        onChange(itemValue);
+                        setSelectedValue(itemValue);
+                      }}
+                    >
+                      <Picker.Item
+                        label="I will create it later"
+                        value={null}
+                      />
+                      {groups.map((item, key) => (
+                        <Picker.Item
+                          label={item.name}
+                          value={item.groupId}
+                          key={key}
+                        />
+                      ))}
+                    </Picker>
+                  )}
+                  name="groupId"
+                  defaultValue=""
+                />
+              </Modal>
+            </Portal>
+            <Button
+              mode="contained"
+              style={styles.button}
+              title="Submit"
+              onPress={handleSubmit(onSubmit)}
+              onPress={showModal}
+            >
+              <Text style={{ color: "#006494" }}>Choose Group</Text>
+            </Button>
+            {errors.group && (
+              <Text style={styles.errorMessage}>Group is required.</Text>
+            )}
+            <Button
+              mode="contained"
+              style={styles.buttonSignUp}
+              title="Submit"
+              onPress={handleSubmit(onSubmit)}
+            >
+              Sign Up
+            </Button>
+          </Provider>
+        )}
+        name="groupId"
+        // rules={{ required: true }}
+        defaultValue={null}
+      />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     width: "100%",
@@ -123,7 +214,15 @@ const styles = StyleSheet.create({
     color: "red",
   },
   button: {
-    marginTop: 10,
+    marginTop: 15,
+    backgroundColor: "white",
+    alignContent: "center",
+    marginLeft: "auto",
+    marginRight: "auto",
+    width: "95%",
+  },
+  buttonSignUp: {
+    marginTop: 15,
     backgroundColor: "#006494",
     alignContent: "center",
     marginLeft: "auto",
@@ -140,5 +239,20 @@ const styles = StyleSheet.create({
     height: 40,
     padding: 10,
     borderRadius: 4,
+  },
+  disabledInput: {
+    backgroundColor: "white",
+    height: 40,
+    padding: 10,
+  },
+  modal: {
+    backgroundColor: "white",
+    padding: 10,
+  },
+  snackbar: {
+    backgroundColor: "#7d0633",
+  },
+  snackbarText: {
+    textAlign: "center",
   },
 });
