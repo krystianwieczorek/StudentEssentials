@@ -1,2 +1,2 @@
 # Student-Essentials
-Student Essentials - mobile application for students with a built-in messenger.
+Student Essentials - a mobile application for students with a built-in messenger.
