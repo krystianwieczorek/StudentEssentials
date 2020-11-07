@@ -16,7 +16,7 @@ import { loginAction } from "../store/actions/loginAction";
 export default function Login({ navigation }) {
   const dispatch = useDispatch();
   const [visible, setVisible] = React.useState(false);
-
+  const { control, handleSubmit, errors } = useForm();
   const onDismissSnackBar = () => setVisible(false);
 
   const onSubmit = (data) => {
@@ -27,7 +27,6 @@ export default function Login({ navigation }) {
       })
       .catch(() => setVisible(true));
   };
-  const { control, handleSubmit, errors } = useForm();
 
   const test = async () => {
     console.log(navigation);

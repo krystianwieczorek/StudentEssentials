@@ -45,7 +45,7 @@ export default function UserProfile({ navigation }) {
             </Paragraph>
             <Paragraph>
               <Text style={styles.textBold}>Assigned to group: </Text>
-              {userProfile?.group.name}
+              {userProfile.group != null ? userProfile?.group?.name : "null"}
             </Paragraph>
           </Card.Content>
         </Card>

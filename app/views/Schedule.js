@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Appbar } from "react-native-paper";
+import { Appbar, Button } from "react-native-paper";
 import {
   Alert,
   StyleSheet,
@@ -12,88 +12,118 @@ import { Chip } from "react-native-paper";
 import { List } from "react-native-paper";
 import { useState, useEffect } from "react";
 import { getShedulePerDay } from "../api/getShedulePerDay";
+import { getUserProfile } from "../api/getUserProfile";
 import { DayEnum } from "../common/DayEnum";
 import { ActivityIndicator } from "react-native-paper";
+import { useSelector } from "react-redux";
+import { userIdSelector } from "../store/selectors/authSelector";
 
-export const Schedule = () => {
+export const Schedule = ({ navigation, route }) => {
   const [subcjetsList, setSubjectList] = useState();
   const [day, setDay] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUserHaveGroup, setIsUserHaveGroup] = useState();
+  const userId = useSelector(userIdSelector);
 
   useEffect(() => {
     setIsLoading(true);
-    getShedulePerDay(1, day).then((response) => {
-      setSubjectList(response.data);
-      setIsLoading(false);
+    getUserProfile(userId).then((response) => {
+      console.log(response.data);
+      setIsUserHaveGroup(response.data.groupId);
+      response.data.groupId != null &&
+        getShedulePerDay(response.data.groupId, day).then((response) => {
+          setSubjectList(response.data);
+          setIsLoading(false);
+        });
     });
-  }, [day]);
+  }, [day, route.params]);
 
   return (
     <>
-      <Appbar.Header style={styles.appBar}>
-        <Chip
-          style={styles.chip}
-          textStyle={{ fontSize: 10, color: "white" }}
-          onPress={() => {
-            setDay(1);
-          }}
-        >
-          Monday
-        </Chip>
-        <Chip
-          style={styles.chip}
-          textStyle={{ fontSize: 10, color: "white" }}
-          onPress={() => setDay(2)}
-        >
-          Tuesday
-        </Chip>
-        <Chip
-          style={styles.chip}
-          textStyle={{ fontSize: 10, color: "white" }}
-          onPress={() => setDay(3)}
-        >
-          Wednesday
-        </Chip>
-        <Chip
-          style={styles.chip}
-          textStyle={{ fontSize: 10, color: "white" }}
-          onPress={() => setDay(4)}
-        >
-          Thursday
-        </Chip>
-        <Chip
-          style={styles.chip}
-          textStyle={{ fontSize: 10, color: "white" }}
-          onPress={() => setDay(5)}
-        >
-          Friday
-        </Chip>
-      </Appbar.Header>
-      <Text style={styles.text}>{DayEnum[day]}</Text>
-      {isLoading ? (
-        <ActivityIndicator
-          style={styles.activityIndicator}
-          size={50}
-          animating={isLoading}
-          color="#006494"
-        />
+      {isUserHaveGroup ? (
+        <>
+          <Appbar.Header style={styles.appBar}>
+            <Chip
+              style={styles.chip}
+              textStyle={{ fontSize: 10, color: "white" }}
+              onPress={() => {
+                setDay(1);
+              }}
+            >
+              Monday
+            </Chip>
+            <Chip
+              style={styles.chip}
+              textStyle={{ fontSize: 10, color: "white" }}
+              onPress={() => setDay(2)}
+            >
+              Tuesday
+            </Chip>
+            <Chip
+              style={styles.chip}
+              textStyle={{ fontSize: 10, color: "white" }}
+              onPress={() => setDay(3)}
+            >
+              Wednesday
+            </Chip>
+            <Chip
+              style={styles.chip}
+              textStyle={{ fontSize: 10, color: "white" }}
+              onPress={() => setDay(4)}
+            >
+              Thursday
+            </Chip>
+            <Chip
+              style={styles.chip}
+              textStyle={{ fontSize: 10, color: "white" }}
+              onPress={() => setDay(5)}
+            >
+              Friday
+            </Chip>
+          </Appbar.Header>
+          <Text style={styles.text}>{DayEnum[day]}</Text>
+          <Button
+            style={{ marginRight: -200, marginTop: -27 }}
+            color="#006494"
+            icon="folder-plus"
+            onPress={() => {
+              navigation.navigate("AddSubject", { day });
+            }}
+          >
+            New Element
+          </Button>
+          {isLoading ? (
+            <ActivityIndicator
+              style={styles.activityIndicator}
+              size={50}
+              animating={isLoading}
+              color="#006494"
+            />
+          ) : (
+            <SafeAreaView style={styles.scrollConteriner}>
+              <ScrollView>
+                <List.Section>
+                  {subcjetsList?.map((item, key) => (
+                    <List.Item
+                      key={key}
+                      title={`${item.subject}`}
+                      description={`${""} hours: ${item.startTime} - ${
+                        item.endTime
+                      } ${"\n"} prof: ${item.profesor} `}
+                      left={(props) => <List.Icon {...props} icon="folder" />}
+                    />
+                  ))}
+                </List.Section>
+              </ScrollView>
+            </SafeAreaView>
+          )}
+        </>
       ) : (
-        <SafeAreaView style={styles.scrollConteriner}>
-          <ScrollView>
-            <List.Section>
-              {subcjetsList?.map((item, key) => (
-                <List.Item
-                  key={key}
-                  title={`${item.subject.name}`}
-                  description={`${""} hours: ${item.startTime} - ${
-                    item.endTime
-                  } ${"\n"} prof: ${item.subject.profesor} `}
-                  left={(props) => <List.Icon {...props} icon="folder" />}
-                />
-              ))}
-            </List.Section>
-          </ScrollView>
-        </SafeAreaView>
+        <View style={styles.container}>
+          <Text style={styles.infoText}>
+            Go to group tab and choose or create your group
+          </Text>
+        </View>
       )}
     </>
   );
@@ -101,6 +131,16 @@ export const Schedule = () => {
 
 const styles = StyleSheet.create({
   appBar: { justifyContent: "center", backgroundColor: "white" },
+  container: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    backgroundColor: "#e3e3e3",
+  },
+  infoText: {
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
   chip: {
     marginLeft: "auto",
     marginRight: "auto",

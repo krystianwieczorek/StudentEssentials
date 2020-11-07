@@ -13,6 +13,7 @@ import Login from "./app/views/Login";
 import Register from "./app/views/Register";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Menu } from "./app/views/Menu";
 import { Schedule } from "./app/views/Schedule";
@@ -24,6 +25,8 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import UserProfile from "./app/views/UserProfile";
+import AddSubject from "./app/views/AddSubject";
+import Group from "./app/views/Group";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -84,23 +87,41 @@ const MenuStackScreen = () => {
     </Stack.Navigator>
   );
 };
-const SheduleStackScreen = () => {
+const ScheduleStackScreen = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        options={{
-          title: `Student Essential`,
-          headerStyle: {
-            backgroundColor: "#006494",
-          },
-          headerTintColor: "#fff",
-          headerTitleStyle: {
-            fontWeight: "bold",
-          },
-        }}
-        name="Menu"
-        component={Schedule}
-      />
+    <Stack.Navigator
+      screenOptions={{
+        title: `Student Essential`,
+        headerStyle: {
+          backgroundColor: "#006494",
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      }}
+    >
+      <Stack.Screen name="Schedule" component={Schedule} />
+      <Stack.Screen name="AddSubject" component={AddSubject} />
+    </Stack.Navigator>
+  );
+};
+
+const GroupStackScreen = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        title: `Student Essential`,
+        headerStyle: {
+          backgroundColor: "#006494",
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      }}
+    >
+      <Stack.Screen name="Group" component={Group} />
     </Stack.Navigator>
   );
 };
@@ -124,7 +145,7 @@ export default function App() {
               tabBarIcon: ({ focused, color, size }) => {
                 if (route.name === "Messenger") {
                   return <Ionicons name="ios-text" size={24} color={color} />;
-                } else if (route.name === "Student's Schedule") {
+                } else if (route.name === "Schedule") {
                   return (
                     <Ionicons name="md-calendar" size={24} color={color} />
                   );
@@ -134,6 +155,8 @@ export default function App() {
                   return (
                     <SimpleLineIcons name="menu" size={24} color={color} />
                   );
+                } else if (route.name === "Group") {
+                  return <FontAwesome name="group" size={24} color={color} />;
                 }
               },
             })}
@@ -142,10 +165,8 @@ export default function App() {
               inactiveTintColor: "gray",
             }}
           >
-            <Tab.Screen
-              name="Student's Schedule"
-              component={SheduleStackScreen}
-            />
+            <Tab.Screen name="Schedule" component={ScheduleStackScreen} />
+            <Tab.Screen name="Group" component={GroupStackScreen} />
             <Tab.Screen name="Messenger" component={MessengerStackScreen} />
             <Tab.Screen name="Menu" component={MenuStackScreen} />
           </Tab.Navigator>
