@@ -30,7 +30,7 @@ import { updateUser } from "../api/updateUser";
 import { updateGroupAction } from "../store/actions/updateGroupAction";
 import { updateGroupSelector } from "../store/selectors/globalSelector";
 
-export default function Group() {
+export default function Group({ navigation }) {
   const { control, handleSubmit, errors } = useForm();
   const [visible, setVisible] = useState(false);
   const showModal = () => setVisible(true);
@@ -48,6 +48,8 @@ export default function Group() {
   const onDismissSnackBar = () => setVisible(false);
 
   const onSubmit = (data) => {
+    setVisible(false);
+    setIsLoading(true);
     data.groupId = selectedValue;
     data.userId = userId;
     updateUser(data).then((response) => {
@@ -61,13 +63,14 @@ export default function Group() {
     groupId != null &&
       getGroup(groupId).then((response) => {
         setGroupProfile(response.data);
+        setIsLoading(false);
+        console.log(response.data);
       });
-    setIsLoading(false);
   }, [groupId, userId]);
 
   useEffect(() => {
     getAllGroups().then((response) => setGroups(response.data));
-  }, []);
+  }, [visible]);
 
   return (
     <View style={styles.container}>
@@ -77,10 +80,15 @@ export default function Group() {
         onDismiss={onDismissSnackBar}
         style={styles.snackbar}
       >
-        <Text style={styles.snackbarText}>Now u can Sign In!</Text>
+        <Text style={styles.snackbarText}>Group changed correctly!</Text>
       </Snackbar>
       {isLoading ? (
-        <ActivityIndicator size={50} animating={isLoading} color="#006494" />
+        <ActivityIndicator
+          style={styles.activityIndicator}
+          size={50}
+          animating={isLoading}
+          color="#006494"
+        />
       ) : (
         <Card style={styles.card}>
           <Card.Content style={styles.card}>
@@ -98,20 +106,39 @@ export default function Group() {
               <Text style={styles.textBold}>Group ID: </Text>
               {groupProfile?.groupId}
             </Paragraph>
+            <Paragraph>
+              <Text style={styles.textBold}>Created by: </Text>
+              {groupProfile?.owner?.firstName} {groupProfile?.owner?.lastName}
+            </Paragraph>
+            <Button
+              onPress={() => navigation.navigate("AddGroup")}
+              style={styles.buttonCreate}
+              color="#006494"
+              uppercase={false}
+            >
+              <Text style={{ color: "white" }}>Create Group</Text>
+            </Button>
+            <Button
+              color="#006494"
+              uppercase={false}
+              title="Submit"
+              style={styles.buttonChoose}
+              onPress={handleSubmit(onSubmit)}
+              onPress={showModal}
+            >
+              <Text style={{ color: "white" }}>Choose Group</Text>
+            </Button>
+            <Button
+              color="#006494"
+              uppercase={false}
+              title="Submit"
+              style={styles.buttonChoose}
+              onPress={() => navigation.navigate("UserList", { groupProfile })}
+            >
+              <Text style={{ color: "white" }}>Assigned User</Text>
+            </Button>
           </Card.Content>
-          <Button style={styles.buttonSignUp} color="#006494" uppercase={false}>
-            <Text style={{ color: "white" }}>Create Group</Text>
-          </Button>
-          <Button
-            color="#006494"
-            uppercase={false}
-            title="Submit"
-            style={styles.buttonSignUp}
-            onPress={handleSubmit(onSubmit)}
-            onPress={showModal}
-          >
-            <Text style={{ color: "white" }}>Choose Group</Text>
-          </Button>
+
           <Provider>
             <Portal>
               <Modal
@@ -137,7 +164,7 @@ export default function Group() {
                 </Picker>
                 <Button
                   mode="contained"
-                  style={styles.buttonSignUp}
+                  style={styles.buttonChoose}
                   title="Submit"
                   onPress={handleSubmit(onSubmit)}
                 >
@@ -169,12 +196,13 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
     marginBottom: 50,
-    backgroundColor: "black",
+    backgroundColor: "#006494",
   },
   card: {
-    paddingTop: 50,
-    paddingBottom: 50,
-    backgroundColor: "#e3e3e3",
+    justifyContent: "center",
+    backgroundColor: "white",
+    width: "100%",
+    height: "100%",
   },
   text: {
     textAlign: "center",
@@ -189,21 +217,15 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: "red",
   },
-  button: {
-    marginTop: 15,
-    backgroundColor: "white",
-    alignContent: "center",
-    marginLeft: "auto",
-    marginRight: "auto",
-    width: "95%",
-  },
-  buttonSignUp: {
+  buttonCreate: {
     marginTop: 15,
     backgroundColor: "#006494",
-    alignContent: "center",
-    marginLeft: "auto",
-    marginRight: "auto",
-    width: "95%",
+    width: "100%",
+  },
+  buttonChoose: {
+    marginTop: 15,
+    backgroundColor: "#006494",
+    width: "100%",
   },
   signUp: {
     marginTop: 15,
@@ -224,12 +246,17 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: "white",
     padding: 10,
-    height: 400,
+    height: "160%",
   },
   snackbar: {
     backgroundColor: "#7d0633",
   },
   snackbarText: {
     textAlign: "center",
+  },
+  activityIndicator: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
   },
 });

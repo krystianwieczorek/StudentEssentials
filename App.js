@@ -27,6 +27,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import UserProfile from "./app/views/UserProfile";
 import AddSubject from "./app/views/AddSubject";
 import Group from "./app/views/Group";
+import AddGroup from "./app/views/AddGroup";
+import UserList from "./app/views/UserList";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -122,6 +124,8 @@ const GroupStackScreen = () => {
       }}
     >
       <Stack.Screen name="Group" component={Group} />
+      <Stack.Screen name="AddGroup" component={AddGroup} />
+      <Stack.Screen name="UserList" component={UserList} />
     </Stack.Navigator>
   );
 };

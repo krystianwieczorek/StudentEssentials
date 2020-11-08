@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Appbar, Button } from "react-native-paper";
+import { Appbar, Button, Provider, Portal, Modal } from "react-native-paper";
 import {
   Alert,
   StyleSheet,
@@ -18,12 +18,19 @@ import { ActivityIndicator } from "react-native-paper";
 import { useSelector } from "react-redux";
 import { userIdSelector } from "../store/selectors/globalSelector";
 import { updateGroupSelector } from "../store/selectors/globalSelector";
+import { back } from "react-native/Libraries/Animated/src/Easing";
 
 export const Schedule = ({ navigation, route }) => {
   const [subcjetsList, setSubjectList] = useState();
   const [day, setDay] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isUserHaveGroup, setIsUserHaveGroup] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState();
+  const [itemNameToDelete, setItemNameToDelete] = useState();
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+
   const userId = useSelector(userIdSelector);
   const groupId = useSelector(updateGroupSelector);
 
@@ -104,7 +111,6 @@ export const Schedule = ({ navigation, route }) => {
           >
             New Element
           </Button>
-          <Button onPress={() => console.log(groupId)}>test</Button>
           {isLoading ? (
             <ActivityIndicator
               style={styles.activityIndicator}
@@ -123,17 +129,49 @@ export const Schedule = ({ navigation, route }) => {
                       description={`${""} hours: ${item.startTime} - ${
                         item.endTime
                       } ${"\n"} prof: ${item.profesor} `}
-                      left={(props) => <List.Icon {...props} icon="folder" />}
+                      left={(props) => (
+                        <List.Icon {...props} icon="folder" color="#006494" />
+                      )}
+                      right={(props) => (
+                        <Button
+                          icon="delete"
+                          color="#7d0633"
+                          onPress={() => {
+                            showModal(true);
+                            setItemToDelete(item.subjectToSheduleId);
+                            setItemNameToDelete(item.subject);
+                            console.log(item);
+                          }}
+                        />
+                      )}
                     />
                   ))}
                 </List.Section>
               </ScrollView>
+
+              <Provider>
+                <Portal>
+                  <Modal
+                    style={styles.modal}
+                    visible={visible}
+                    onDismiss={hideModal}
+                    contentContainerStyle={styles.modal}
+                  >
+                    <Text style={styles.modalText}>Confirm deletion of:</Text>
+                    <Text style={styles.modalTextItemName}>
+                      {itemNameToDelete}{" "}
+                    </Text>
+                    <Button style={styles.buttonConfirm}>
+                      <Text style={{ color: "white" }}>Delete</Text>
+                    </Button>
+                  </Modal>
+                </Portal>
+              </Provider>
             </SafeAreaView>
           )}
         </>
       ) : (
         <View style={styles.container}>
-          <Button onPress={() => console.log(groupId)}>test</Button>
           <Text style={styles.infoText}>
             Go to group tab and choose or create your group
           </Text>
@@ -151,6 +189,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#e3e3e3",
   },
+  modal: {
+    backgroundColor: "white",
+    padding: 10,
+    height: "50%",
+  },
+  modalText: {
+    marginLeft: "auto",
+    marginRight: "auto",
+    fontSize: 20,
+  },
+  modalTextItemName: {
+    marginLeft: "auto",
+    marginRight: "auto",
+    textAlign: "center",
+    color: "#7d0633",
+    fontSize: 35,
+  },
   infoText: {
     marginLeft: "auto",
     marginRight: "auto",
@@ -161,7 +216,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#006494",
   },
   scrollConteriner: {
-    height: "100%",
+    height: "83%",
   },
   text: {
     fontSize: 20,
@@ -172,5 +227,10 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "80%",
     justifyContent: "center",
+  },
+  buttonConfirm: {
+    marginTop: 15,
+    backgroundColor: "#7d0633",
+    width: "100%",
   },
 });

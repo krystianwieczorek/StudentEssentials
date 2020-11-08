@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#e3e3e3",
     justifyContent: "center",
-    padding: 15,
   },
   title: {
     textAlign: "center",
@@ -73,10 +72,13 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
     marginBottom: 50,
-    backgroundColor: "black",
+    backgroundColor: "#006494",
   },
   card: {
-    paddingTop: 50,
-    paddingBottom: 50,
+    justifyContent: "center",
+    marginLeft: "auto",
+    marginRight: "auto",
+    width: "100%",
+    height: "100%",
   },
 });

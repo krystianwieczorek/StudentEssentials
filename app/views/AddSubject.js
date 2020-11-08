@@ -9,6 +9,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DayEnum } from "../common/DayEnum";
 import { Foundation } from "@expo/vector-icons";
 import { addNewSubject } from "../api/addNewSubject";
+import { useSelector } from "react-redux";
+import { updateGroupSelector } from "../store/selectors/globalSelector";
+import { ActivityIndicator } from "react-native-paper";
 
 export default function AddSubject({ navigation, route }) {
   const [visible, setVisible] = useState(false);
@@ -16,19 +19,24 @@ export default function AddSubject({ navigation, route }) {
   const { control, handleSubmit, errors } = useForm();
   const [chosenStartTime, setChosenStartTime] = useState(new Date());
   const [chosenEndTime, setChosenEndTime] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(false);
+
+  const groupId = useSelector(updateGroupSelector);
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
 
   const onSubmit = (data) => {
+    setIsLoading(true);
     data.chosenEndTime;
     data.startTime = chosenStartTime.toLocaleTimeString();
     data.endTime = chosenEndTime.toLocaleTimeString();
-    data.groupId = 1;
+    data.groupId = groupId;
     data.sheduleDay = route.params.day;
 
     addNewSubject(data).then((response) => {
       response.status == "200" && setVisible(true);
+      setIsLoading(false);
       setTimeout(() => {
         navigation.navigate("Schedule", { route });
         clearTimeout();
@@ -49,99 +57,113 @@ export default function AddSubject({ navigation, route }) {
       >
         <Text style={styles.snackbarText}>Subject added correctly!</Text>
       </Snackbar>
-      <Foundation
-        style={styles.icon}
-        name="folder-add"
-        size={50}
-        color="black"
-      />
-      <Text style={styles.text}>New {DayEnum[route.params.day]} element</Text>
-      <Controller
-        control={control}
-        render={({ onChange, onBlur, value }) => (
-          <TextInput
-            style={styles.input}
-            label="Subject"
-            mode="outlined"
-            onBlur={onBlur}
-            onChangeText={(value) => onChange(value)}
-            value={value}
+      {isLoading ? (
+        <>
+          <ActivityIndicator
+            style={styles.activityIndicator}
+            size={50}
+            animating={isLoading}
+            color="#006494"
           />
-        )}
-        name="subject"
-        // rules={{ required: true}}
-        defaultValue=""
-      />
-      {errors.subject && (
-        <Text style={styles.errorMessage}>Subject is required.</Text>
-      )}
-      <Controller
-        control={control}
-        render={({ onChange, onBlur, value }) => (
-          <TextInput
-            style={styles.input}
-            label="Profesor"
-            mode="outlined"
-            onBlur={onBlur}
-            onChangeText={(value) => onChange(value)}
-            value={value}
+        </>
+      ) : (
+        <View>
+          <Foundation
+            style={styles.icon}
+            name="folder-add"
+            size={50}
+            color="#006494"
           />
-        )}
-        name="profesor"
-        // rules={{ required: true }}
-        defaultValue=""
-      />
-      {errors.profesor && (
-        <Text style={styles.errorMessage}>Profesor is required.</Text>
-      )}
-
-      <Provider>
-        <Portal>
-          <Modal
-            visible={visibleModal}
-            onDismiss={hideModal}
-            contentContainerStyle={styles.modal}
+          <Text style={styles.text}>
+            New {DayEnum[route.params.day]} element
+          </Text>
+          <Controller
+            control={control}
+            render={({ onChange, onBlur, value }) => (
+              <TextInput
+                style={styles.input}
+                label="Subject"
+                mode="outlined"
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+              />
+            )}
+            name="subject"
+            // rules={{ required: true}}
+            defaultValue=""
+          />
+          {errors.subject && (
+            <Text style={styles.errorMessage}>Subject is required.</Text>
+          )}
+          <Controller
+            control={control}
+            render={({ onChange, onBlur, value }) => (
+              <TextInput
+                style={styles.input}
+                label="Profesor"
+                mode="outlined"
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+              />
+            )}
+            name="profesor"
+            // rules={{ required: true }}
+            defaultValue=""
+          />
+          {errors.profesor && (
+            <Text style={styles.errorMessage}>Profesor is required.</Text>
+          )}
+          <Button
+            mode="contained"
+            style={styles.button}
+            title="Submit"
+            onPress={showModal}
           >
-            <Text style={styles.textModal}>Start Time</Text>
+            <Text style={{ color: "#006494" }}>Set Time</Text>
+          </Button>
+          <Button
+            mode="contained"
+            style={styles.buttonAdd}
+            title="Submit"
+            onPress={handleSubmit(onSubmit)}
+          >
+            Add
+          </Button>
+          <Provider>
+            <Portal>
+              <Modal
+                visible={visibleModal}
+                onDismiss={hideModal}
+                contentContainerStyle={styles.modal}
+              >
+                <Text style={styles.textModal}>Start Time</Text>
 
-            <DatePickerIOS
-              mode="time"
-              initialDate={chosenStartTime}
-              onDateChange={(startValue) => {
-                setChosenStartTime(startValue);
-              }}
-            />
+                <DatePickerIOS
+                  mode="time"
+                  initialDate={chosenStartTime}
+                  onDateChange={(startValue) => {
+                    setChosenStartTime(startValue);
+                  }}
+                />
 
-            <Text style={styles.textModal}>End Time</Text>
-            <DatePickerIOS
-              mode="time"
-              initialDate={chosenEndTime}
-              onDateChange={(startValue) => {
-                setChosenEndTime(startValue);
-              }}
-            />
-            <Button onPress={() => setVisibleModal(false)}>
-              <Text style={{ color: "#006494", fontSize: 15 }}>Close</Text>
-            </Button>
-          </Modal>
-        </Portal>
-        <Button
-          mode="contained"
-          style={styles.button}
-          title="Submit"
-          onPress={showModal}
-        >
-          <Text style={{ color: "#006494" }}>Set Time</Text>
-        </Button>
-        <Button
-          mode="contained"
-          style={styles.buttonAdd}
-          title="Submit"
-          onPress={handleSubmit(onSubmit)}
-        >
-          Add
-        </Button>
-      </Provider>
+                <Text style={styles.textModal}>End Time</Text>
+                <DatePickerIOS
+                  mode="time"
+                  initialDate={chosenEndTime}
+                  onDateChange={(startValue) => {
+                    setChosenEndTime(startValue);
+                  }}
+                />
+                <Button onPress={() => setVisibleModal(false)}>
+                  <Text style={{ color: "#006494", fontSize: 15 }}>Close</Text>
+                </Button>
+              </Modal>
+            </Portal>
+          </Provider>
+        </View>
+      )}
     </View>
   );
 }
@@ -164,6 +186,7 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: "white",
     padding: 10,
+    height: "160%",
   },
   icon: {
     textAlign: "center",
@@ -211,5 +234,10 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
     width: "95%",
+  },
+  activityIndicator: {
+    width: "100%",
+    height: "80%",
+    justifyContent: "center",
   },
 });
