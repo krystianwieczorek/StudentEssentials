@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Appbar, Button, Provider, Portal, Modal } from "react-native-paper";
+import {
+  Appbar,
+  Button,
+  Provider,
+  Portal,
+  Modal,
+  Snackbar,
+} from "react-native-paper";
 import {
   Alert,
   StyleSheet,
@@ -18,7 +25,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { useSelector } from "react-redux";
 import { userIdSelector } from "../store/selectors/globalSelector";
 import { updateGroupSelector } from "../store/selectors/globalSelector";
-import { back } from "react-native/Libraries/Animated/src/Easing";
+import { deleteSheduleElement } from "../api/deleteSheduleElement";
 
 export const Schedule = ({ navigation, route }) => {
   const [subcjetsList, setSubjectList] = useState();
@@ -28,6 +35,10 @@ export const Schedule = ({ navigation, route }) => {
   const [visible, setVisible] = useState(false);
   const [itemToDelete, setItemToDelete] = useState();
   const [itemNameToDelete, setItemNameToDelete] = useState();
+  const [visibleSNack, setVisibleSnack] = useState(false);
+  const [refreshFlag, setRefreshFlag] = useState(false);
+
+  const onDismissSnackBar = () => setVisibleSnack(false);
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
@@ -55,7 +66,18 @@ export const Schedule = ({ navigation, route }) => {
           setIsLoading(false);
         });
     });
-  }, [day, route.params]);
+  }, [day, route.params, refreshFlag]);
+
+  const handleDelete = () => {
+    setIsLoading(true);
+    const data = { subjectToSheduleId: itemToDelete };
+    deleteSheduleElement(data).then((response) => {
+      setIsLoading(false);
+      hideModal();
+      setRefreshFlag(!refreshFlag);
+      response.status == "200" && setVisibleSnack(true);
+    });
+  };
 
   return (
     <>
@@ -148,7 +170,16 @@ export const Schedule = ({ navigation, route }) => {
                   ))}
                 </List.Section>
               </ScrollView>
-
+              <Snackbar
+                visible={visibleSNack}
+                duration={3000}
+                onDismiss={onDismissSnackBar}
+                style={styles.snackbar}
+              >
+                <Text style={styles.snackbarText}>
+                  Shedule item deleted successfully!
+                </Text>
+              </Snackbar>
               <Provider>
                 <Portal>
                   <Modal
@@ -159,9 +190,12 @@ export const Schedule = ({ navigation, route }) => {
                   >
                     <Text style={styles.modalText}>Confirm deletion of:</Text>
                     <Text style={styles.modalTextItemName}>
-                      {itemNameToDelete}{" "}
+                      {itemNameToDelete}
                     </Text>
-                    <Button style={styles.buttonConfirm}>
+                    <Button
+                      onPress={() => handleDelete()}
+                      style={styles.buttonConfirm}
+                    >
                       <Text style={{ color: "white" }}>Delete</Text>
                     </Button>
                   </Modal>
@@ -232,5 +266,8 @@ const styles = StyleSheet.create({
     marginTop: 15,
     backgroundColor: "#7d0633",
     width: "100%",
+  },
+  snackbar: {
+    backgroundColor: "#7d0633",
   },
 });
