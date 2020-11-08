@@ -21,7 +21,7 @@ import { SimpleLineIcons } from "@expo/vector-icons";
 import {
   isSignedInSelector,
   authSelector,
-} from "./app/store/selectors/authSelector";
+} from "./app/store/selectors/globalSelector";
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import UserProfile from "./app/views/UserProfile";
@@ -136,6 +136,7 @@ export default function App() {
     };
     setUserToken();
   }, [token]);
+
   return (
     <PaperProvider>
       <NavigationContainer>

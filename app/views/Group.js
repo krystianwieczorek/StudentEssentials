@@ -22,11 +22,13 @@ import {
 } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
 import { getAllGroups } from "../api/getAllGroups";
-import { userIdSelector } from "../store/selectors/authSelector";
+import { userIdSelector } from "../store/selectors/globalSelector";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserProfile } from "../api/getUserProfile";
 import { getGroup } from "../api/getGroup";
 import { updateUser } from "../api/updateUser";
+import { updateGroupAction } from "../store/actions/updateGroupAction";
+import { updateGroupSelector } from "../store/selectors/globalSelector";
 
 export default function Group() {
   const { control, handleSubmit, errors } = useForm();
@@ -37,32 +39,31 @@ export default function Group() {
   const [groups, setGroups] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [groupProfile, setGroupProfile] = useState();
-  const userId = useSelector(userIdSelector);
   const [visibleSNack, setVisibleSnack] = useState(false);
+  const userId = useSelector(userIdSelector);
+  const groupId = useSelector(updateGroupSelector);
+
+  const dispatch = useDispatch();
+
+  const onDismissSnackBar = () => setVisible(false);
 
   const onSubmit = (data) => {
     data.groupId = selectedValue;
     data.userId = userId;
     updateUser(data).then((response) => {
       response.status == "200" && setVisibleSnack(true);
+      dispatch(updateGroupAction(selectedValue));
     });
-    console.log(data);
   };
-
-  const onDismissSnackBar = () => setVisible(false);
 
   useEffect(() => {
     setIsLoading(true);
-    getUserProfile(userId).then(
-      (response) =>
-        response.data.groupId != null &&
-        getGroup(response.data.groupId).then((response) => {
-          console.log(response.data);
-          setGroupProfile(response.data);
-        })
-    );
+    groupId != null &&
+      getGroup(groupId).then((response) => {
+        setGroupProfile(response.data);
+      });
     setIsLoading(false);
-  }, [userId, selectedValue]);
+  }, [groupId, userId]);
 
   useEffect(() => {
     getAllGroups().then((response) => setGroups(response.data));
@@ -101,7 +102,6 @@ export default function Group() {
           <Button style={styles.buttonSignUp} color="#006494" uppercase={false}>
             <Text style={{ color: "white" }}>Create Group</Text>
           </Button>
-
           <Button
             color="#006494"
             uppercase={false}
@@ -123,6 +123,7 @@ export default function Group() {
                   selectedValue={selectedValue}
                   style={styles.picker}
                   onValueChange={(itemValue, itemIndex) => {
+                    console.log(itemValue);
                     setSelectedValue(itemValue);
                   }}
                 >

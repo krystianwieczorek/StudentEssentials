@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
-import { userIdSelector } from "../store/selectors/authSelector";
+import { userIdSelector } from "../store/selectors/globalSelector";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserProfile } from "../api/getUserProfile";
 import { Avatar } from "react-native-paper";

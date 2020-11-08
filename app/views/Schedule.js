@@ -16,20 +16,32 @@ import { getUserProfile } from "../api/getUserProfile";
 import { DayEnum } from "../common/DayEnum";
 import { ActivityIndicator } from "react-native-paper";
 import { useSelector } from "react-redux";
-import { userIdSelector } from "../store/selectors/authSelector";
+import { userIdSelector } from "../store/selectors/globalSelector";
+import { updateGroupSelector } from "../store/selectors/globalSelector";
 
 export const Schedule = ({ navigation, route }) => {
   const [subcjetsList, setSubjectList] = useState();
   const [day, setDay] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [isUserHaveGroup, setIsUserHaveGroup] = useState();
+  const [isUserHaveGroup, setIsUserHaveGroup] = useState(false);
   const userId = useSelector(userIdSelector);
+  const groupId = useSelector(updateGroupSelector);
+
+  useEffect(() => {
+    setIsLoading(true);
+    groupId != null && setIsUserHaveGroup(true);
+    groupId != null &&
+      getShedulePerDay(groupId, day).then((response) => {
+        setSubjectList(response.data);
+        setIsLoading(false);
+      });
+  }, [groupId]);
 
   useEffect(() => {
     setIsLoading(true);
     getUserProfile(userId).then((response) => {
       console.log(response.data);
-      setIsUserHaveGroup(response.data.groupId);
+      response.data.groupId != null && setIsUserHaveGroup(true);
       response.data.groupId != null &&
         getShedulePerDay(response.data.groupId, day).then((response) => {
           setSubjectList(response.data);
@@ -92,6 +104,7 @@ export const Schedule = ({ navigation, route }) => {
           >
             New Element
           </Button>
+          <Button onPress={() => console.log(groupId)}>test</Button>
           {isLoading ? (
             <ActivityIndicator
               style={styles.activityIndicator}
@@ -120,6 +133,7 @@ export const Schedule = ({ navigation, route }) => {
         </>
       ) : (
         <View style={styles.container}>
+          <Button onPress={() => console.log(groupId)}>test</Button>
           <Text style={styles.infoText}>
             Go to group tab and choose or create your group
           </Text>

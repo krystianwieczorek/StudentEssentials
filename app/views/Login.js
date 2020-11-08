@@ -10,7 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   isSignedInSelector,
   authSelector,
-} from "../store/selectors/authSelector";
+} from "../store/selectors/globalSelector";
 import { loginAction } from "../store/actions/loginAction";
 
 export default function Login({ navigation }) {
@@ -22,7 +22,13 @@ export default function Login({ navigation }) {
   const onSubmit = (data) => {
     authClient(data)
       .then((response) => {
-        dispatch(loginAction(response.data.token, response.data.id));
+        dispatch(
+          loginAction(
+            response.data.token,
+            response.data.id,
+            response.data.groupId
+          )
+        );
         console.log(response.data);
       })
       .catch(() => setVisible(true));
