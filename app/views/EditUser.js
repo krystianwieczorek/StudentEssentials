@@ -13,12 +13,18 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { updateUser } from "../api/updateUser";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { refreshSelector } from "../store/selectors/globalSelector";
+import { refreshAction } from "../store/actions/refreshAction";
 
 export default function EditUser({ navigation, route }) {
   const { params } = route;
   const [visibleSnack, setVisibleSnack] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { control, handleSubmit, errors } = useForm();
+  const flag = useSelector(refreshSelector);
+
+  const dispatch = useDispatch();
 
   const onDismissSnackBar = () => setVisibleSnack(false);
 
@@ -28,6 +34,7 @@ export default function EditUser({ navigation, route }) {
     data.groupId = params.groupId;
     updateUser(data).then((response) => {
       response.status == "200" && setVisibleSnack(true);
+      dispatch(refreshAction(!flag));
       setTimeout(() => {
         navigation.navigate("UserProfile", { route });
         clearTimeout();

@@ -3,6 +3,7 @@ const initialState = {
   userId: null,
   isSignedIn: false,
   groupId: null,
+  flag: false,
 };
 
 export const globalReducer = (state = initialState, action) => {
@@ -17,6 +18,8 @@ export const globalReducer = (state = initialState, action) => {
       };
     case "SIGNOUT":
       return initialState;
+    case "REFRESH":
+      return { ...state, flag: action.flag };
     case "UPDATEGROUP":
       return {
         ...state,

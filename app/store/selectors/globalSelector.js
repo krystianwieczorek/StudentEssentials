@@ -21,3 +21,8 @@ export const updateGroupSelector = createSelector(
   globalSelector,
   (state) => state.groupId
 );
+
+export const refreshSelector = createSelector(
+  globalSelector,
+  (state) => state.flag
+);

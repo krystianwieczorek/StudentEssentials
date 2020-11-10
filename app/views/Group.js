@@ -29,6 +29,7 @@ import { getGroup } from "../api/getGroup";
 import { updateUser } from "../api/updateUser";
 import { updateGroupAction } from "../store/actions/updateGroupAction";
 import { updateGroupSelector } from "../store/selectors/globalSelector";
+import { refreshSelector } from "../store/selectors/globalSelector";
 
 export default function Group({ navigation }) {
   const { control, handleSubmit, errors } = useForm();
@@ -42,6 +43,7 @@ export default function Group({ navigation }) {
   const [visibleSNack, setVisibleSnack] = useState(false);
   const userId = useSelector(userIdSelector);
   const groupId = useSelector(updateGroupSelector);
+  const flag = useSelector(refreshSelector);
 
   const dispatch = useDispatch();
 
@@ -65,7 +67,7 @@ export default function Group({ navigation }) {
         setGroupProfile(response.data);
         setIsLoading(false);
       });
-  }, [groupId, userId]);
+  }, [groupId, userId, flag]);
 
   useEffect(() => {
     getAllGroups().then((response) => setGroups(response.data));
