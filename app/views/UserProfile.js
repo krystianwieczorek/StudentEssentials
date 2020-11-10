@@ -7,17 +7,18 @@ import { Avatar } from "react-native-paper";
 import { Card, Title, Paragraph, Button } from "react-native-paper";
 import { ActivityIndicator } from "react-native-paper";
 
-export default function UserProfile({ navigation }) {
+export default function UserProfile({ navigation, route }) {
   const userId = useSelector(userIdSelector);
   const [userProfile, setUserProfile] = useState();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     getUserProfile(userId).then((response) => {
       setUserProfile(response.data);
       setIsLoading(false);
     });
-  }, [userId]);
+  }, [userId, route]);
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -45,7 +46,7 @@ export default function UserProfile({ navigation }) {
             </Paragraph>
             <Paragraph>
               <Text style={styles.textBold}>Assigned to group: </Text>
-              {userProfile.group != null ? userProfile?.group?.name : "null"}
+              {userProfile?.group != null ? userProfile?.group?.name : "null"}
             </Paragraph>
             <Button
               onPress={() => navigation.navigate("EditUser", userProfile)}

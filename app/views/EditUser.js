@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Entypo } from "@expo/vector-icons";
+import { updateUser } from "../api/updateUser";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 export default function EditUser({ navigation, route }) {
@@ -23,8 +23,16 @@ export default function EditUser({ navigation, route }) {
   const onDismissSnackBar = () => setVisibleSnack(false);
 
   const onSubmit = (data) => {
-    data.userId = userId;
-    console.log(route);
+    setIsLoading(true);
+    data.userId = params.userId;
+    data.groupId = params.groupId;
+    updateUser(data).then((response) => {
+      response.status == "200" && setVisibleSnack(true);
+      setTimeout(() => {
+        navigation.navigate("UserProfile", { route });
+        clearTimeout();
+      }, 2000);
+    });
   };
   return (
     <View style={styles.container}>
@@ -42,7 +50,7 @@ export default function EditUser({ navigation, route }) {
             onDismiss={onDismissSnackBar}
             style={styles.snackbar}
           >
-            <Text style={styles.snackbarText}>Subject edited correctly!</Text>
+            <Text style={styles.snackbarText}>Profile edited correctly!</Text>
           </Snackbar>
         </View>
       ) : (
