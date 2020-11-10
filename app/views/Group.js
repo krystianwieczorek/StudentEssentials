@@ -7,8 +7,8 @@ import {
   View,
   SafeAreaView,
   ScrollView,
-  Picker,
 } from "react-native";
+import { Picker } from "@react-native-community/picker";
 import { Chip, Snackbar, List } from "react-native-paper";
 import { useState, useEffect } from "react";
 import { getShedulePerDay } from "../api/getShedulePerDay";
@@ -37,7 +37,7 @@ export default function Group({ navigation }) {
   const hideModal = () => setVisible(false);
   const [selectedValue, setSelectedValue] = useState();
   const [groups, setGroups] = useState();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [groupProfile, setGroupProfile] = useState();
   const [visibleSNack, setVisibleSnack] = useState(false);
   const userId = useSelector(userIdSelector);
@@ -64,7 +64,6 @@ export default function Group({ navigation }) {
       getGroup(groupId).then((response) => {
         setGroupProfile(response.data);
         setIsLoading(false);
-        console.log(response.data);
       });
   }, [groupId, userId]);
 
@@ -74,21 +73,23 @@ export default function Group({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Snackbar
-        visible={visibleSNack}
-        duration={3000}
-        onDismiss={onDismissSnackBar}
-        style={styles.snackbar}
-      >
-        <Text style={styles.snackbarText}>Group changed correctly!</Text>
-      </Snackbar>
       {isLoading ? (
-        <ActivityIndicator
-          style={styles.activityIndicator}
-          size={50}
-          animating={isLoading}
-          color="#006494"
-        />
+        <View style={styles.container}>
+          <ActivityIndicator
+            style={styles.activityIndicator}
+            size={50}
+            animating={isLoading}
+            color="#006494"
+          />
+          <Snackbar
+            visible={visibleSNack}
+            duration={3000}
+            onDismiss={onDismissSnackBar}
+            style={styles.snackbar}
+          >
+            <Text style={styles.snackbarText}>Group changed correctly!</Text>
+          </Snackbar>
+        </View>
       ) : (
         <Card style={styles.card}>
           <Card.Content style={styles.card}>
@@ -150,7 +151,6 @@ export default function Group({ navigation }) {
                   selectedValue={selectedValue}
                   style={styles.picker}
                   onValueChange={(itemValue, itemIndex) => {
-                    console.log(itemValue);
                     setSelectedValue(itemValue);
                   }}
                 >
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: "white",
     padding: 10,
-    height: "160%",
+    height: "70%",
   },
   snackbar: {
     backgroundColor: "#7d0633",

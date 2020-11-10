@@ -37,23 +37,23 @@ export default function AddGroup({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Snackbar
-        visible={visible}
-        duration={3000}
-        onDismiss={onDismissSnackBar}
-        style={styles.snackbar}
-      >
-        <Text style={styles.snackbarText}>Group added correctly!</Text>
-      </Snackbar>
       {isLoading ? (
-        <>
+        <View style={styles.container}>
           <ActivityIndicator
             style={styles.activityIndicator}
             size={50}
             animating={isLoading}
             color="#006494"
           />
-        </>
+          <Snackbar
+            visible={visible}
+            duration={3000}
+            onDismiss={onDismissSnackBar}
+            style={styles.snackbar}
+          >
+            <Text style={styles.snackbarText}>Group added correctly!</Text>
+          </Snackbar>
+        </View>
       ) : (
         <View style={styles.card}>
           <MaterialIcons

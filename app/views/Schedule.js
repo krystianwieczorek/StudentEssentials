@@ -58,7 +58,6 @@ export const Schedule = ({ navigation, route }) => {
   useEffect(() => {
     setIsLoading(true);
     getUserProfile(userId).then((response) => {
-      console.log(response.data);
       response.data.groupId != null && setIsUserHaveGroup(true);
       response.data.groupId != null &&
         getShedulePerDay(response.data.groupId, day).then((response) => {
@@ -68,140 +67,94 @@ export const Schedule = ({ navigation, route }) => {
     });
   }, [day, route.params, refreshFlag]);
 
-  const handleDelete = () => {
-    setIsLoading(true);
-    const data = { subjectToSheduleId: itemToDelete };
-    deleteSheduleElement(data).then((response) => {
-      setIsLoading(false);
-      hideModal();
-      setRefreshFlag(!refreshFlag);
-      response.status == "200" && setVisibleSnack(true);
-    });
-  };
-
   return (
     <>
       {isUserHaveGroup ? (
         <>
-          <Appbar.Header style={styles.appBar}>
-            <Chip
-              style={styles.chip}
-              textStyle={{ fontSize: 10, color: "white" }}
-              onPress={() => {
-                setDay(1);
-              }}
-            >
-              Monday
-            </Chip>
-            <Chip
-              style={styles.chip}
-              textStyle={{ fontSize: 10, color: "white" }}
-              onPress={() => setDay(2)}
-            >
-              Tuesday
-            </Chip>
-            <Chip
-              style={styles.chip}
-              textStyle={{ fontSize: 10, color: "white" }}
-              onPress={() => setDay(3)}
-            >
-              Wednesday
-            </Chip>
-            <Chip
-              style={styles.chip}
-              textStyle={{ fontSize: 10, color: "white" }}
-              onPress={() => setDay(4)}
-            >
-              Thursday
-            </Chip>
-            <Chip
-              style={styles.chip}
-              textStyle={{ fontSize: 10, color: "white" }}
-              onPress={() => setDay(5)}
-            >
-              Friday
-            </Chip>
-          </Appbar.Header>
-          <Text style={styles.text}>{DayEnum[day]}</Text>
-          <Button
-            style={{ marginRight: -200, marginTop: -27 }}
-            color="#006494"
-            icon="folder-plus"
-            onPress={() => {
-              navigation.navigate("AddSubject", { day });
-            }}
-          >
-            New Element
-          </Button>
           {isLoading ? (
-            <ActivityIndicator
-              style={styles.activityIndicator}
-              size={50}
-              animating={isLoading}
-              color="#006494"
-            />
+            <View style={styles.container}>
+              <ActivityIndicator
+                style={styles.activityIndicator}
+                size={50}
+                animating={isLoading}
+                color="#006494"
+              />
+            </View>
           ) : (
-            <SafeAreaView style={styles.scrollConteriner}>
-              <ScrollView>
-                <List.Section>
-                  {subcjetsList?.map((item, key) => (
-                    <List.Item
-                      key={key}
-                      title={`${item.subject}`}
-                      description={`${""} hours: ${item.startTime} - ${
-                        item.endTime
-                      } ${"\n"} prof: ${item.profesor} `}
-                      left={(props) => (
-                        <List.Icon {...props} icon="folder" color="#006494" />
-                      )}
-                      right={(props) => (
-                        <Button
-                          icon="delete"
-                          color="#7d0633"
-                          onPress={() => {
-                            showModal(true);
-                            setItemToDelete(item.subjectToSheduleId);
-                            setItemNameToDelete(item.subject);
-                            console.log(item);
-                          }}
-                        />
-                      )}
-                    />
-                  ))}
-                </List.Section>
-              </ScrollView>
-              <Snackbar
-                visible={visibleSNack}
-                duration={3000}
-                onDismiss={onDismissSnackBar}
-                style={styles.snackbar}
+            <>
+              <Appbar.Header style={styles.appBar}>
+                <Chip
+                  style={styles.chip}
+                  textStyle={{ fontSize: 10, color: "white" }}
+                  onPress={() => {
+                    setDay(1);
+                  }}
+                >
+                  Monday
+                </Chip>
+                <Chip
+                  style={styles.chip}
+                  textStyle={{ fontSize: 10, color: "white" }}
+                  onPress={() => setDay(2)}
+                >
+                  Tuesday
+                </Chip>
+                <Chip
+                  style={styles.chip}
+                  textStyle={{ fontSize: 10, color: "white" }}
+                  onPress={() => setDay(3)}
+                >
+                  Wednesday
+                </Chip>
+                <Chip
+                  style={styles.chip}
+                  textStyle={{ fontSize: 10, color: "white" }}
+                  onPress={() => setDay(4)}
+                >
+                  Thursday
+                </Chip>
+                <Chip
+                  style={styles.chip}
+                  textStyle={{ fontSize: 10, color: "white" }}
+                  onPress={() => setDay(5)}
+                >
+                  Friday
+                </Chip>
+              </Appbar.Header>
+              <Text style={styles.text}>{DayEnum[day]}</Text>
+              <Button
+                style={{ marginRight: -200, marginTop: -27 }}
+                color="#006494"
+                icon="folder-plus"
+                onPress={() => {
+                  navigation.navigate("AddSubject", { day });
+                }}
               >
-                <Text style={styles.snackbarText}>
-                  Shedule item deleted successfully!
-                </Text>
-              </Snackbar>
-              <Provider>
-                <Portal>
-                  <Modal
-                    style={styles.modal}
-                    visible={visible}
-                    onDismiss={hideModal}
-                    contentContainerStyle={styles.modal}
-                  >
-                    <Text style={styles.modalText}>Confirm deletion of:</Text>
-                    <Text style={styles.modalTextItemName}>
-                      {itemNameToDelete}
-                    </Text>
-                    <Button
-                      onPress={() => handleDelete()}
-                      style={styles.buttonConfirm}
-                    >
-                      <Text style={{ color: "white" }}>Delete</Text>
-                    </Button>
-                  </Modal>
-                </Portal>
-              </Provider>
-            </SafeAreaView>
+                New Element
+              </Button>
+
+              <SafeAreaView style={styles.scrollConteriner}>
+                <ScrollView>
+                  <List.Section>
+                    {subcjetsList?.map((item, key) => (
+                      <List.Item
+                        key={key}
+                        title={`${item.subject}`}
+                        onPress={() =>
+                          navigation.navigate("SujectDetails", { item })
+                        }
+                        description={`${""} hours: ${item.startTime} - ${
+                          item.endTime
+                        } ${"\n"} prof: ${item.profesor} `}
+                        left={(props) => (
+                          <List.Icon {...props} icon="folder" color="#006494" />
+                        )}
+                      />
+                    ))}
+                  </List.Section>
+                </ScrollView>
+              </SafeAreaView>
+            </>
           )}
         </>
       ) : (

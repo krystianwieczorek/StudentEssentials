@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Alert, StyleSheet, Text, View, DatePickerIOS } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { TextInput } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
 import { useForm, Controller } from "react-hook-form";
@@ -14,17 +15,22 @@ import { updateGroupSelector } from "../store/selectors/globalSelector";
 import { ActivityIndicator } from "react-native-paper";
 
 export default function AddSubject({ navigation, route }) {
-  const [visible, setVisible] = useState(false);
+  const [visibleSnack, setVisibleSnack] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
+  const [visibleModal2, setVisibleModal2] = useState(false);
   const { control, handleSubmit, errors } = useForm();
   const [chosenStartTime, setChosenStartTime] = useState(new Date());
   const [chosenEndTime, setChosenEndTime] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
+  const [startTimeInput, setStartTimeInput] = useState();
+  const [endTimeInput, setEndTimeInput] = useState();
 
   const groupId = useSelector(updateGroupSelector);
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
+  const showModal2 = () => setVisibleModal2(true);
+  const hideModal2 = () => setVisibleModal2(false);
 
   const onSubmit = (data) => {
     setIsLoading(true);
@@ -35,7 +41,7 @@ export default function AddSubject({ navigation, route }) {
     data.sheduleDay = route.params.day;
 
     addNewSubject(data).then((response) => {
-      response.status == "200" && setVisible(true);
+      response.status == "200" && setVisibleSnack(true);
       setIsLoading(false);
       setTimeout(() => {
         navigation.navigate("Schedule", { route });
@@ -49,23 +55,23 @@ export default function AddSubject({ navigation, route }) {
   //   console.log(route.params.day);
   return (
     <View style={styles.container}>
-      <Snackbar
-        visible={visible}
-        duration={3000}
-        onDismiss={onDismissSnackBar}
-        style={styles.snackbar}
-      >
-        <Text style={styles.snackbarText}>Subject added correctly!</Text>
-      </Snackbar>
       {isLoading ? (
-        <>
+        <View style={styles.container}>
           <ActivityIndicator
             style={styles.activityIndicator}
             size={50}
             animating={isLoading}
             color="#006494"
           />
-        </>
+          <Snackbar
+            visible={visibleSnack}
+            duration={3000}
+            onDismiss={onDismissSnackBar}
+            style={styles.snackbar}
+          >
+            <Text style={styles.snackbarText}>Subject added correctly!</Text>
+          </Snackbar>
+        </View>
       ) : (
         <View>
           <Foundation
@@ -115,13 +121,38 @@ export default function AddSubject({ navigation, route }) {
           {errors.profesor && (
             <Text style={styles.errorMessage}>Profesor is required.</Text>
           )}
+          <TextInput
+            style={styles.input}
+            label="Start Time"
+            mode="outlined"
+            disabled
+            onTouchStart={() => setVisibleModal(true)}
+            onChangeText={(value) => onChange(value)}
+            value={startTimeInput}
+          />
+          <TextInput
+            style={styles.input}
+            label="End Time"
+            mode="outlined"
+            disabled
+            onChangeText={(value) => onChange(value)}
+            value={endTimeInput}
+          />
           <Button
             mode="contained"
             style={styles.button}
             title="Submit"
             onPress={showModal}
           >
-            <Text style={{ color: "#006494" }}>Set Time</Text>
+            <Text style={{ color: "#006494" }}>Set Start Time</Text>
+          </Button>
+          <Button
+            mode="contained"
+            style={styles.button}
+            title="Submit"
+            onPress={showModal2}
+          >
+            <Text style={{ color: "#006494" }}>Set End Time</Text>
           </Button>
           <Button
             mode="contained"
@@ -131,39 +162,46 @@ export default function AddSubject({ navigation, route }) {
           >
             Add
           </Button>
-          <Provider>
-            <Portal>
-              <Modal
-                visible={visibleModal}
-                onDismiss={hideModal}
-                contentContainerStyle={styles.modal}
-              >
-                <Text style={styles.textModal}>Start Time</Text>
-
-                <DatePickerIOS
-                  mode="time"
-                  initialDate={chosenStartTime}
-                  onDateChange={(startValue) => {
-                    setChosenStartTime(startValue);
-                  }}
-                />
-
-                <Text style={styles.textModal}>End Time</Text>
-                <DatePickerIOS
-                  mode="time"
-                  initialDate={chosenEndTime}
-                  onDateChange={(startValue) => {
-                    setChosenEndTime(startValue);
-                  }}
-                />
-                <Button onPress={() => setVisibleModal(false)}>
-                  <Text style={{ color: "#006494", fontSize: 15 }}>Close</Text>
-                </Button>
-              </Modal>
-            </Portal>
-          </Provider>
         </View>
       )}
+      <Provider>
+        <Portal>
+          <Modal
+            visible={visibleModal}
+            onDismiss={hideModal}
+            contentContainerStyle={styles.modal}
+          >
+            <Text style={styles.textModal}>Start Time</Text>
+
+            <DateTimePicker
+              mode="time"
+              display="default"
+              value={chosenStartTime}
+              onChange={(event, selectedDate) => {
+                setChosenStartTime(selectedDate);
+                setStartTimeInput(selectedDate.toLocaleTimeString());
+              }}
+            />
+          </Modal>
+
+          <Modal
+            visible={visibleModal2}
+            onDismiss={hideModal2}
+            contentContainerStyle={styles.modal}
+          >
+            <Text style={styles.textModal}>End Time</Text>
+            <DateTimePicker
+              mode="time"
+              display="default"
+              value={chosenEndTime}
+              onChange={(event, selectedDate) => {
+                setChosenEndTime(selectedDate);
+                setEndTimeInput(selectedDate.toLocaleTimeString());
+              }}
+            />
+          </Modal>
+        </Portal>
+      </Provider>
     </View>
   );
 }
@@ -186,7 +224,7 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: "white",
     padding: 10,
-    height: "160%",
+    height: "60%",
   },
   icon: {
     textAlign: "center",

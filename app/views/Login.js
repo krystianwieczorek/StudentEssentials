@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { TextInput } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
@@ -15,7 +15,7 @@ import { loginAction } from "../store/actions/loginAction";
 
 export default function Login({ navigation }) {
   const dispatch = useDispatch();
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
   const { control, handleSubmit, errors } = useForm();
   const onDismissSnackBar = () => setVisible(false);
 
@@ -29,13 +29,8 @@ export default function Login({ navigation }) {
             response.data.groupId
           )
         );
-        console.log(response.data);
       })
       .catch(() => setVisible(true));
-  };
-
-  const test = async () => {
-    console.log(navigation);
   };
 
   return (
@@ -52,7 +47,6 @@ export default function Login({ navigation }) {
       </Snackbar>
       <FontAwesome style={styles.icon} name="lock" size={50} color="black" />
       <Text style={styles.text}>Sign in</Text>
-      <Button onPress={test}>Test</Button>
       <Controller
         control={control}
         render={({ onChange, onBlur, value }) => (

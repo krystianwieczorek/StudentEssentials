@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const apiClient = axios.create({
   baseURL: configuration.apiUrl,
+  headers: { "Access-Control-Allow-Origin": "*" },
 });
 
 apiClient.interceptors.request.use(

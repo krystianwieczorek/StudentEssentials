@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { userIdSelector } from "../store/selectors/globalSelector";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserProfile } from "../api/getUserProfile";
 import { Avatar } from "react-native-paper";
-import { Card, Title, Paragraph } from "react-native-paper";
+import { Card, Title, Paragraph, Button } from "react-native-paper";
 import { ActivityIndicator } from "react-native-paper";
 
 export default function UserProfile({ navigation }) {
@@ -47,6 +47,12 @@ export default function UserProfile({ navigation }) {
               <Text style={styles.textBold}>Assigned to group: </Text>
               {userProfile.group != null ? userProfile?.group?.name : "null"}
             </Paragraph>
+            <Button
+              onPress={() => navigation.navigate("EditUser", userProfile)}
+              style={styles.button}
+            >
+              <Text style={{ color: "white" }}>Edit</Text>
+            </Button>
           </Card.Content>
         </Card>
       )}
@@ -60,6 +66,14 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#e3e3e3",
     justifyContent: "center",
+  },
+  button: {
+    marginTop: 10,
+    backgroundColor: "#006494",
+    alignContent: "center",
+    marginLeft: "auto",
+    marginRight: "auto",
+    width: "100%",
   },
   title: {
     textAlign: "center",

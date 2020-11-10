@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View, Picker } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { Picker } from "@react-native-community/picker";
 import { TextInput } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
 import { useForm, Controller } from "react-hook-form";
@@ -12,14 +13,14 @@ export default function Register({ navigation }) {
   const [selectedValue, setSelectedValue] = useState();
   const [visible, setVisible] = useState(false);
   const [groups, setGroups] = useState();
+  const [visibleSNack, setVisibleSnack] = useState(false);
+  const [inputInfo, setInputInfo] = useState();
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
+
   const { control, handleSubmit, errors } = useForm();
-  const [visibleSNack, setVisibleSnack] = useState(false);
 
   const onDismissSnackBar = () => setVisible(false);
-
-  // const onSubmit = (data) => console.log(data);
 
   const onSubmit = (data) => {
     addNewUser(data).then((response) => {
@@ -125,6 +126,19 @@ export default function Register({ navigation }) {
         <Text style={styles.errorMessage}>Password is required.</Text>
       )}
 
+      <TextInput
+        style={styles.input}
+        label="Group Name"
+        mode="outlined"
+        disabled
+        onChangeText={(value) => onChange(value)}
+        value={
+          inputInfo?.name == undefined
+            ? "I will choose or create group later"
+            : inputInfo?.name
+        }
+      />
+
       <Controller
         control={control}
         render={() => (
@@ -144,13 +158,14 @@ export default function Register({ navigation }) {
                       onValueChange={(itemValue, itemIndex) => {
                         onChange(itemValue);
                         setSelectedValue(itemValue);
+                        setInputInfo(groups[itemValue - 1]);
                       }}
                     >
                       <Picker.Item
-                        label="I will create it later"
+                        label="I will choose or create group later"
                         value={null}
                       />
-                      {groups.map((item, key) => (
+                      {groups?.map((item, key) => (
                         <Picker.Item
                           label={item.name}
                           value={item.groupId}
