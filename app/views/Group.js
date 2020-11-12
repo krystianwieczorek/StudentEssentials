@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   },
   card: {
     justifyContent: "center",
-    backgroundColor: "white",
+    backgroundColor: "#e3e3e3",
     width: "100%",
     height: "100%",
   },

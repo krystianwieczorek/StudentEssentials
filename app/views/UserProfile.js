@@ -95,5 +95,6 @@ const styles = StyleSheet.create({
     marginRight: "auto",
     width: "100%",
     height: "100%",
+    backgroundColor: "#e3e3e3",
   },
 });
