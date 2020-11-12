@@ -88,7 +88,7 @@ export default function Messenger() {
     <KeyboardAvoidingView
       keyboardVerticalOffset={60}
       contentContainerStyle={{ marginTop: 2 }}
-      behavior={Platform.OS == "ios" ? "position" : "height"}
+      behavior={Platform.OS == "ios" ? "position" : "position"}
       style={styles.container}
     >
       <SafeAreaView style={styles.scrollConteriner}>
