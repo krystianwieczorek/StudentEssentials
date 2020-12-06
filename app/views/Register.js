@@ -113,6 +113,7 @@ export default function Register({ navigation }) {
             style={styles.input}
             label="Password"
             mode="outlined"
+            secureTextEntry
             onBlur={onBlur}
             onChangeText={(value) => onChange(value)}
             value={value}

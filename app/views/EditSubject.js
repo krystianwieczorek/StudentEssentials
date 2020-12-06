@@ -106,6 +106,25 @@ export default function EditSubject({ navigation, route }) {
           {errors.subject && (
             <Text style={styles.errorMessage}>Subject is required.</Text>
           )}
+          <Controller
+            control={control}
+            render={({ onChange, onBlur, value }) => (
+              <TextInput
+                style={styles.input}
+                label="Classroom"
+                mode="outlined"
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+              />
+            )}
+            name="classroom"
+            // rules={{ required: true }}
+            defaultValue={item?.classroom}
+          />
+          {errors.classroom && (
+            <Text style={styles.errorMessage}>Classroom is required.</Text>
+          )}
           <TextInput
             style={styles.input}
             label="Start Time"

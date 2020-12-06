@@ -19,6 +19,7 @@ import { Chip } from "react-native-paper";
 import { List } from "react-native-paper";
 import { useState, useEffect } from "react";
 import { getShedulePerDay } from "../api/getShedulePerDay";
+import { getGroup } from "../api/getGroup";
 import { getUserProfile } from "../api/getUserProfile";
 import { DayEnum } from "../common/DayEnum";
 import { ActivityIndicator } from "react-native-paper";
@@ -37,6 +38,7 @@ export const Schedule = ({ navigation, route }) => {
   const [itemNameToDelete, setItemNameToDelete] = useState();
   const [visibleSNack, setVisibleSnack] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [isOwner, setIsOwner] = useState();
 
   const onDismissSnackBar = () => setVisibleSnack(false);
   const showModal = () => setVisible(true);
@@ -52,6 +54,11 @@ export const Schedule = ({ navigation, route }) => {
       getShedulePerDay(groupId, day).then((response) => {
         setSubjectList(response.data);
         setIsLoading(false);
+        getGroup(groupId).then((response) => {
+          response.data.owner?.userId === userId
+            ? setIsOwner(true)
+            : setIsOwner(false);
+        });
       });
   }, [groupId]);
 
@@ -63,6 +70,11 @@ export const Schedule = ({ navigation, route }) => {
         getShedulePerDay(response.data.groupId, day).then((response) => {
           setSubjectList(response.data);
           setIsLoading(false);
+          getGroup(groupId).then((response) => {
+            response.data.owner?.userId === userId
+              ? setIsOwner(true)
+              : setIsOwner(false);
+          });
         });
     });
   }, [day, route.params, refreshFlag]);
@@ -76,7 +88,7 @@ export const Schedule = ({ navigation, route }) => {
               <ActivityIndicator
                 style={styles.activityIndicator}
                 size={50}
-                animating={isLoading}
+                animating={true}
                 color="#006494"
               />
             </View>
@@ -122,35 +134,66 @@ export const Schedule = ({ navigation, route }) => {
                 </Chip>
               </Appbar.Header>
               <Text style={styles.text}>{DayEnum[day]}</Text>
-              <Button
-                style={{ marginRight: -200, marginTop: -27 }}
-                color="#006494"
-                icon="folder-plus"
-                onPress={() => {
-                  navigation.navigate("AddSubject", { day });
-                }}
-              >
-                New Element
-              </Button>
+              {isOwner === true && (
+                <Button
+                  style={{ marginRight: -200, marginTop: -27 }}
+                  color="#006494"
+                  icon="folder-plus"
+                  onPress={() => {
+                    navigation.navigate("AddSubject", { day });
+                  }}
+                >
+                  New Element
+                </Button>
+              )}
 
               <SafeAreaView style={styles.scrollConteriner}>
                 <ScrollView>
                   <List.Section>
-                    {subcjetsList?.map((item, key) => (
-                      <List.Item
-                        key={key}
-                        title={`${item.subject}`}
-                        onPress={() =>
-                          navigation.navigate("SujectDetails", { item })
-                        }
-                        description={`${""} hours: ${item.startTime} - ${
-                          item.endTime
-                        } ${"\n"} prof: ${item.profesor} `}
-                        left={(props) => (
-                          <List.Icon {...props} icon="folder" color="#006494" />
-                        )}
-                      />
-                    ))}
+                    {subcjetsList?.map((item, key) =>
+                      isOwner ? (
+                        <List.Item
+                          key={key}
+                          descriptionNumberOfLines={4}
+                          title={`${item.subject}`}
+                          onPress={() =>
+                            navigation.navigate("SujectDetails", { item })
+                          }
+                          description={`${""} hours: ${item.startTime.substring(
+                            0,
+                            5
+                          )} - ${item.endTime.substring(0, 5)}  ${"\n"} prof: ${
+                            item.profesor
+                          } ${"\n"} ${"classroom:"} ${item.classroom}`}
+                          left={(props) => (
+                            <List.Icon
+                              {...props}
+                              icon="folder"
+                              color="#006494"
+                            />
+                          )}
+                        />
+                      ) : (
+                        <List.Item
+                          key={key}
+                          descriptionNumberOfLines={4}
+                          title={`${item.subject}`}
+                          description={`${""} hours: ${item.startTime.substring(
+                            0,
+                            5
+                          )} - ${item.endTime.substring(0, 5)}  ${"\n"} prof: ${
+                            item.profesor
+                          } ${"\n"} ${"classroom:"} ${item.classroom}`}
+                          left={(props) => (
+                            <List.Icon
+                              {...props}
+                              icon="folder"
+                              color="#006494"
+                            />
+                          )}
+                        />
+                      )
+                    )}
                   </List.Section>
                 </ScrollView>
               </SafeAreaView>

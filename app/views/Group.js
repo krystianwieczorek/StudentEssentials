@@ -38,7 +38,7 @@ export default function Group({ navigation }) {
   const hideModal = () => setVisible(false);
   const [selectedValue, setSelectedValue] = useState();
   const [groups, setGroups] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [groupProfile, setGroupProfile] = useState();
   const [visibleSNack, setVisibleSnack] = useState(false);
   const userId = useSelector(userIdSelector);
@@ -61,16 +61,21 @@ export default function Group({ navigation }) {
   };
 
   useEffect(() => {
-    setIsLoading(true);
-    groupId != null &&
+    let unmounted = false;
+    if (!unmounted && groupId != null) {
       getGroup(groupId).then((response) => {
         setGroupProfile(response.data);
         setIsLoading(false);
       });
+    }
+    return () => {
+      unmounted = true;
+    };
   }, [groupId, userId, flag]);
 
   useEffect(() => {
     getAllGroups().then((response) => setGroups(response.data));
+    setIsLoading(false);
   }, [visible]);
 
   return (
@@ -101,18 +106,24 @@ export default function Group({ navigation }) {
               icon="account-group-outline"
             />
             <Title style={styles.title}>Group Profile</Title>
-            <Paragraph>
-              <Text style={styles.textBold}>Group name: </Text>
-              {groupProfile?.name}
-            </Paragraph>
-            <Paragraph>
-              <Text style={styles.textBold}>Group ID: </Text>
-              {groupProfile?.groupId}
-            </Paragraph>
-            <Paragraph>
-              <Text style={styles.textBold}>Created by: </Text>
-              {groupProfile?.owner?.firstName} {groupProfile?.owner?.lastName}
-            </Paragraph>
+            {groupProfile != null && (
+              <>
+                <Paragraph>
+                  <Text style={styles.textBold}>Group name: </Text>
+                  {groupProfile?.name}
+                </Paragraph>
+                <Paragraph>
+                  <Text style={styles.textBold}>Group ID: </Text>
+                  {groupProfile?.groupId}
+                </Paragraph>
+                <Paragraph>
+                  <Text style={styles.textBold}>Created by: </Text>
+                  {groupProfile?.owner?.firstName}{" "}
+                  {groupProfile?.owner?.lastName}
+                </Paragraph>
+              </>
+            )}
+
             <Button
               onPress={() => navigation.navigate("AddGroup")}
               style={styles.buttonCreate}

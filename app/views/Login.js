@@ -60,7 +60,7 @@ export default function Login({ navigation }) {
           />
         )}
         name="email"
-        // rules={{ required: true, pattern: /^\S+@\S+\.\S+$/ }}
+        rules={{ required: true, pattern: /^\S+@\S+\.\S+$/ }}
         defaultValue=""
       />
       {errors.email && (
@@ -73,13 +73,14 @@ export default function Login({ navigation }) {
             style={styles.input}
             label="Password"
             mode="outlined"
+            secureTextEntry
             onBlur={onBlur}
             onChangeText={(value) => onChange(value)}
             value={value}
           />
         )}
         name="password"
-        // rules={{ required: true }}
+        rules={{ required: true }}
         defaultValue=""
       />
       {errors.password && (

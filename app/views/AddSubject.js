@@ -96,7 +96,7 @@ export default function AddSubject({ navigation, route }) {
               />
             )}
             name="subject"
-            // rules={{ required: true}}
+            rules={{ required: true }}
             defaultValue=""
           />
           {errors.subject && (
@@ -115,20 +115,38 @@ export default function AddSubject({ navigation, route }) {
               />
             )}
             name="profesor"
-            // rules={{ required: true }}
+            rules={{ required: true }}
             defaultValue=""
           />
           {errors.profesor && (
             <Text style={styles.errorMessage}>Profesor is required.</Text>
+          )}
+          <Controller
+            control={control}
+            render={({ onChange, onBlur, value }) => (
+              <TextInput
+                style={styles.input}
+                label="Classroom"
+                mode="outlined"
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+              />
+            )}
+            name="classroom"
+            rules={{ required: true }}
+            defaultValue=""
+          />
+          {errors.classroom && (
+            <Text style={styles.errorMessage}>Classroom is required.</Text>
           )}
           <TextInput
             style={styles.input}
             label="Start Time"
             mode="outlined"
             disabled
-            onTouchStart={() => setVisibleModal(true)}
             onChangeText={(value) => onChange(value)}
-            value={startTimeInput}
+            value={startTimeInput?.substring(0, 5)}
           />
           <TextInput
             style={styles.input}
@@ -136,7 +154,7 @@ export default function AddSubject({ navigation, route }) {
             mode="outlined"
             disabled
             onChangeText={(value) => onChange(value)}
-            value={endTimeInput}
+            value={endTimeInput?.substring(0, 5)}
           />
           <Button
             mode="contained"

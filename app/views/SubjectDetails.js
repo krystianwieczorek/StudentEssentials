@@ -76,12 +76,16 @@ export default function SujectDetails({ navigation, route }) {
                 {item.profesor}
               </Paragraph>
               <Paragraph>
+                <Text style={styles.textBold}>Classroom: </Text>
+                {item.classroom}
+              </Paragraph>
+              <Paragraph>
                 <Text style={styles.textBold}>Start Time: </Text>
-                {item.startTime}
+                {item.startTime.substring(0, 5)}
               </Paragraph>
               <Paragraph>
                 <Text style={styles.textBold}>End Time: </Text>
-                {item.endTime}
+                {item.endTime.substring(0, 5)}
               </Paragraph>
               <Paragraph>
                 <Text style={styles.textBold}>Day: </Text>
@@ -143,6 +147,7 @@ const styles = StyleSheet.create({
     marginRight: "auto",
     width: "100%",
     height: "100%",
+    backgroundColor: "#e3e3e3",
   },
   modal: {
     backgroundColor: "white",

@@ -32,7 +32,7 @@ export default function Messenger() {
   const userId = useSelector(userIdSelector);
   const groupId = useSelector(updateGroupSelector);
 
-  const hubUrl = "https://253145aa5e9b.ngrok.io/chathub";
+  const hubUrl = "https://332baeb92906.ngrok.io/chathub";
 
   const connectionHub = new signalR.HubConnectionBuilder()
     .withUrl(hubUrl)
@@ -48,7 +48,7 @@ export default function Messenger() {
     //   setClear(response);
     // });
     conn.invoke("SendMessage", groupId, data).catch(function (err) {
-      setMessages(response.rootElement);
+      // setMessages(response.rootElement);
     });
   };
 
