@@ -83,7 +83,7 @@ export default function EditUser({ navigation, route }) {
               />
             )}
             name="firstName"
-            // rules={{ required: true }}
+            rules={{ required: true }}
             defaultValue={params.firstName}
           />
           {errors.firstName && (
@@ -102,7 +102,7 @@ export default function EditUser({ navigation, route }) {
               />
             )}
             name="lastName"
-            // rules={{ required: true }}
+            rules={{ required: true }}
             defaultValue={params.lastName}
           />
           {errors.lastName && (
@@ -120,8 +120,8 @@ export default function EditUser({ navigation, route }) {
                 value={value}
               />
             )}
-            name="profesor"
-            // rules={{ required: true }}
+            name="email"
+            rules={{ required: true, pattern: /^\S+@\S+\.\S+$/ }}
             defaultValue={params.email}
           />
           {errors.email && (

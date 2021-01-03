@@ -30,6 +30,7 @@ import { updateUser } from "../api/updateUser";
 import { updateGroupAction } from "../store/actions/updateGroupAction";
 import { updateGroupSelector } from "../store/selectors/globalSelector";
 import { refreshSelector } from "../store/selectors/globalSelector";
+import { refreshAction } from "../store/actions/refreshAction";
 
 export default function Group({ navigation }) {
   const { control, handleSubmit, errors } = useForm();
@@ -47,20 +48,21 @@ export default function Group({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const onDismissSnackBar = () => setVisible(false);
+  const onDismissSnackBar = () => setVisibleSnack(false);
 
   const onSubmit = (data) => {
-    setVisible(false);
     setIsLoading(true);
     data.groupId = selectedValue;
     data.userId = userId;
     updateUser(data).then((response) => {
       response.status == "200" && setVisibleSnack(true);
       dispatch(updateGroupAction(selectedValue));
+      setVisible(false);
     });
   };
 
   useEffect(() => {
+    setIsLoading(true);
     let unmounted = false;
     if (!unmounted && groupId != null) {
       getGroup(groupId).then((response) => {

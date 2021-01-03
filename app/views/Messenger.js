@@ -32,7 +32,7 @@ export default function Messenger() {
   const userId = useSelector(userIdSelector);
   const groupId = useSelector(updateGroupSelector);
 
-  const hubUrl = "https://332baeb92906.ngrok.io/chathub";
+  const hubUrl = "https://fefd90cd0f47.ngrok.io/chathub";
 
   const connectionHub = new signalR.HubConnectionBuilder()
     .withUrl(hubUrl)
@@ -44,11 +44,8 @@ export default function Messenger() {
     data.userId = userId;
     data.groupId = groupId;
     data.date = new Date();
-    // sendMessage(data).then((response) => {
-    //   setClear(response);
-    // });
     conn.invoke("SendMessage", groupId, data).catch(function (err) {
-      // setMessages(response.rootElement);
+      console.log(err);
     });
   };
 
@@ -60,24 +57,22 @@ export default function Messenger() {
       scrollView.current.scrollToEnd();
       clearTimeout();
     }, 1000);
-  }, [clear]);
+  }, [groupId]);
 
   useEffect(() => {
     connectionHub.on("ReceiveMessage", (response) => {
-      setMessages(response.rootElement);
-      setTimeout(() => {
-        scrollView.current.scrollToEnd();
-        clearTimeout();
-      }, 1000);
+      if (parseInt(response.rootElement[0].groupId) == groupId) {
+        setMessages(response.rootElement);
+        setTimeout(() => {
+          scrollView.current.scrollToEnd();
+          clearTimeout();
+        }, 1000);
+      }
     });
     connectionHub
       .start()
       .then(() => {
-        // connectionHub.invoke("SendMessage", 1).catch(function (err) {
-        //   return console.error(err.toString());
-        // });
-
-        console.log("polaczone");
+        console.log("connected");
       })
       .catch((err) => this.logError(err));
 

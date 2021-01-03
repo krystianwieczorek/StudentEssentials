@@ -32,6 +32,7 @@ import UserList from "./app/views/UserList";
 import SujectDetails from "./app/views/SubjectDetails";
 import EditSubject from "./app/views/EditSubject";
 import EditUser from "./app/views/EditUser";
+import ChangePassword from "./app/views/ChangePassword";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -90,6 +91,7 @@ const MenuStackScreen = () => {
       <Stack.Screen name="Menu" component={Menu} />
       <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="EditUser" component={EditUser} />
+      <Stack.Screen name="ChangePassword" component={ChangePassword} />
     </Stack.Navigator>
   );
 };

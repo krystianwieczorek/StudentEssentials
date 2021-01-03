@@ -42,7 +42,6 @@ export default function AddSubject({ navigation, route }) {
 
     addNewSubject(data).then((response) => {
       response.status == "200" && setVisibleSnack(true);
-      setIsLoading(false);
       setTimeout(() => {
         navigation.navigate("Schedule", { route });
         clearTimeout();

@@ -34,7 +34,13 @@ export const Menu = ({ navigation }) => {
       >
         User Profile
       </Button>
-      <Button color="white" uppercase={false} title="" style={styles.button}>
+      <Button
+        color="white"
+        uppercase={false}
+        title=""
+        onPress={() => navigation.navigate("ChangePassword")}
+        style={styles.button}
+      >
         Change Password
       </Button>
       <Button
