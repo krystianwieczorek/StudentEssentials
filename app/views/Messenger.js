@@ -20,6 +20,7 @@ import { useSelector } from "react-redux";
 import { updateGroupSelector } from "../store/selectors/globalSelector";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as signalR from "@aspnet/signalr";
+import configuration from "../helpers/configFile";
 
 export default function Messenger() {
   const [messages, setMessages] = useState();
@@ -32,7 +33,7 @@ export default function Messenger() {
   const userId = useSelector(userIdSelector);
   const groupId = useSelector(updateGroupSelector);
 
-  const hubUrl = "https://fefd90cd0f47.ngrok.io/chathub";
+  const hubUrl = `${configuration.apiUrl}/chathub`;
 
   const connectionHub = new signalR.HubConnectionBuilder()
     .withUrl(hubUrl)

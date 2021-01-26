@@ -1,6 +1,0 @@
-{
-  "apiUrl": "https://fefd90cd0f47.ngrok.io",
-  "dev": {
-    "enableReduxDevToolsExtension": true
-  }
-}
